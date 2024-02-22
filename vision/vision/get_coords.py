@@ -1,8 +1,6 @@
 import numpy as np
 import cv2
 
-tile_idx = int(input("Masukkan angka tempat penempatan: "))
-
 # load a color image 
 img = cv2.imread('board.png')
 # get the image width and height
@@ -33,6 +31,7 @@ for cnt in contours:
         tiley = round((y / img_height) * 3)     
 
         # put a number in the tile
+        print(f'tilecount: {tilecount} = ({x + 80}, {y + 200})')
         cv2.putText(img, str(tilecount), (x + 80, y + 200), cv2.FONT_HERSHEY_SIMPLEX, 5, (255, 0, 0), 10)
 
 # display image and release resources when key is pressed
