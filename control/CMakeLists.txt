@@ -16,8 +16,12 @@ find_package(std_msgs REQUIRED)
 add_executable(get_move src/moves_pub.cpp)
 ament_target_dependencies(get_move rclcpp std_msgs)
 
+add_executable(comp_move src/compmove_pub.cpp)
+ament_target_dependencies(comp_move rclcpp std_msgs)
+
 install(TARGETS
   get_move
+  comp_move
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
