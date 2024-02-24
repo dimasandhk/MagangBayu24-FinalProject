@@ -134,6 +134,12 @@ private:
       }
     }
 
+    // Occupying the Center
+    if (find(computer_moves_.begin(), computer_moves_.end(), 5) == computer_moves_.end() &&
+      find(player_moves_.begin(), player_moves_.end(), 5) == player_moves_.end()) {
+      return 5;
+    }
+
     // Check for Winning Moves
     for (int move = 1; move <= 9; ++move) {
       if (find(computer_moves_.begin(), computer_moves_.end(), move) == computer_moves_.end() &&
@@ -176,12 +182,6 @@ private:
           return move;
         }
       }
-    }
-
-    // Occupying the Center
-    if (find(computer_moves_.begin(), computer_moves_.end(), 5) == computer_moves_.end() &&
-      find(player_moves_.begin(), player_moves_.end(), 5) == player_moves_.end()) {
-      return 5;
     }
 
     // Occupying the Corners
