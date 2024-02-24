@@ -22,7 +22,7 @@ public:
         computer_moves_.push_back(computer_move);
         std::cout << "Computer's move: " << computer_move << std::endl;
         for (int move: player_moves_) {
-          std::cout << "P:" << move;
+          std::cout << "P:" << move << ", ";
         }
         std::cout << std::endl;
         for (int move: computer_moves_) {
