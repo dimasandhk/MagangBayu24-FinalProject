@@ -7,34 +7,32 @@
 class PlayerNode : public rclcpp::Node {
 public:
   PlayerNode() : Node("player_node") {
+    // pub player move
     publisher_ = this->create_publisher<std_msgs::msg::Int32>("player_move_topic", 10);
     subscriber_ = this->create_subscription<std_msgs::msg::Int32>(
       "computer_move_topic", 10,
       [this](const std_msgs::msg::Int32::SharedPtr msg) {
         std::cout << "Masuk bg";
-        // Store computer's move
         int computer_move = msg->data;
         computer_moves_.push_back(computer_move);
 
-        // Display computer's move
         std::cout << "Computer's move: " << computer_move << std::endl;
       }
     );
 
+    // ambil input angka
     while (rclcpp::ok()) {
       int player_move = getPlayerMove();
       if (player_move >= 1 && player_move <= 9 && !isMoveAlreadyMade(player_move)) {
-        // Store player's move
         player_moves_.push_back(player_move);
         
         auto message = std::make_unique<std_msgs::msg::Int32>();
         message->data = player_move;
         publisher_->publish(std::move(message));
         
-        // Display player's move
         std::cout << "Player's move: " << player_move << std::endl;
       } else {
-        std::cout << "Invalid move. Please enter a number between 1 and 9." << std::endl;
+        std::cout << "Invalid move. Please enter a number between 1 and 9, and don't input the same number" << std::endl;
       }
     }
   }
@@ -45,7 +43,7 @@ private:
   std::vector<int> player_moves_;
   std::vector<int> computer_moves_;
 
-  int getPlayerMove() {
+  int getPlayerMove() { // prompt input
     std::cout << "Enter your move (1-9): ";
     std::string input;
     std::getline(std::cin, input);

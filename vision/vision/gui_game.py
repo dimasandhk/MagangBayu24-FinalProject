@@ -14,22 +14,25 @@ import cv2
 # tilecount: 1 = (95, 215)
 
 class GUINode(Node):
+    # koordinat tiap tile yang sudah dicari sebelumnya di file get_coords.py
     pos_x = [95, 377, 645, 95, 377, 645, 95, 377, 645]
     pos_y = [215, 215, 215, 497, 497, 497, 766, 766, 766]
+    # simpan move player dan komputer
     comp_moves = []
     player_moves = []
 
     def __init__(self):
-        super().__init__('my_subscriber')
+        super().__init__('gui_node')
+        # subscribe ke topic move komputer & player
         self.computer_subscriber = self.create_subscription(Int32, 'computer_move_topic', self.computer_callback, 10)
         self.player_subscriber = self.create_subscription(Int32, 'player_move_topic', self.player_callback, 10)
         image_path = 'src/MagangBayu24-FinalProject/vision/resource/board.png'
-        print(image_path)
+        print(image_path) # tampil board
         self.image = cv2.imread(image_path)
-        self.game_over = False
+        self.game_over = False # variabel untuk handle game over
 
     def computer_callback(self, msg):
-        if not self.game_over:
+        if not self.game_over: # jika sudah selesai, stop ambil input
             self.comp_moves.append(msg.data)
             self.get_logger().info('Received computer move: %d' % msg.data)
             self.put_text(msg.data, 'c')
@@ -43,6 +46,7 @@ class GUINode(Node):
             self.check_game()
 
     def put_text(self, tilecount, move):
+        # jika player, teksnya X warna merah
         tile_info = ['X', (0, 0, 255)] if move == 'p' else ['O', (255, 0, 0)]
         cv2.putText(
             self.image, 
@@ -53,11 +57,11 @@ class GUINode(Node):
             tile_info[1], 
             10
         )
-        # Display the image with text
+        # Display image, set 500 ms agar dapat terupdate saat komputer jalan
         cv2.imshow("Tictactoe", self.image)
         cv2.waitKey(500)
     
-    def check_game(self):
+    def check_game(self): # fungsi cek game sudah selesai atau belum
         if len(self.player_moves) + len(self.comp_moves) >= 9:
             self.game_over = True
             return

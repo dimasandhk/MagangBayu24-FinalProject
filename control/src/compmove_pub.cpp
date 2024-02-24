@@ -8,16 +8,16 @@
 class ComputerNode : public rclcpp::Node {
 public:
   ComputerNode() : Node("computer_node") {
+    // sub player move
     subscriber_ = this->create_subscription<std_msgs::msg::Int32>(
       "player_move_topic",
       10,
       [this](const std_msgs::msg::Int32::SharedPtr msg) {
-        // Player's move received
         int player_move = msg->data;
         player_moves_.push_back(player_move);
         std::cout << "Player's move: " << player_move << std::endl;
                 
-        // Calculate computer's move
+        // tentuin langkah komputer
         int computer_move = getComputerMove();
         computer_moves_.push_back(computer_move);
         std::cout << "Computer's move: " << computer_move << std::endl;
@@ -30,13 +30,14 @@ public:
         }
         std::cout << std::endl << std::endl;
 
-        // Publish computer's move
+        // pub comp move
         auto message = std::make_unique<std_msgs::msg::Int32>();
         message->data = computer_move;
         publisher_->publish(std::move(message));
       }
     );
 
+    // pub comp move
     publisher_ = this->create_publisher<std_msgs::msg::Int32>("computer_move_topic", 10);
   }
 
@@ -52,7 +53,7 @@ private:
   std::vector<int> player_moves_;
   std::vector<int> computer_moves_;
 
-  bool isWinner(const std::vector<int>& moves) {
+  bool isWinner(const std::vector<int>& moves) { // fungsi cek kombinasi utk menang
     std::vector<std::vector<int>> winningCombinations = {
       {1, 2, 3}, {4, 5, 6}, {7, 8, 9},
       {1, 4, 7}, {2, 5, 8}, {3, 6, 9},
@@ -74,7 +75,7 @@ private:
     return false;
   }
 
-  bool isForkingMove(int move, const std::vector<int>& moves) {
+  bool isForkingMove(int move, const std::vector<int>& moves) { // fungsi cek kombinasi fork
     std::vector<int> possibleMoves = moves;
     possibleMoves.push_back(move);
     int count = 0;
@@ -98,7 +99,7 @@ private:
     return count >= 2;
   }
 
-  bool isBlockingFork(int move, const std::vector<int>& moves) {
+  bool isBlockingFork(int move, const std::vector<int>& moves) { // fungsi block fork player
     std::vector<int> possibleMoves = moves;
     possibleMoves.push_back(move);
     int count = 0;
@@ -123,9 +124,8 @@ private:
   }
 
   int getComputerMove() {
-    // If both compMoves and player_moves_ are empty, return a random corner
     if (computer_moves_.empty() && player_moves_.empty()) {
-      int randomCorner = rand() % 4 + 1; // Generate a random number between 1 and 4
+      int randomCorner = rand() % 4 + 1; // random kalau kosong
       switch (randomCorner) {
         case 1: return 1;
         case 2: return 3;
@@ -134,13 +134,13 @@ private:
       }
     }
 
-    // Occupying the Center
+    // isi center
     if (find(computer_moves_.begin(), computer_moves_.end(), 5) == computer_moves_.end() &&
       find(player_moves_.begin(), player_moves_.end(), 5) == player_moves_.end()) {
       return 5;
     }
 
-    // Check for Winning Moves
+    // cek kombinasi menang
     for (int move = 1; move <= 9; ++move) {
       if (find(computer_moves_.begin(), computer_moves_.end(), move) == computer_moves_.end() &&
         find(player_moves_.begin(), player_moves_.end(), move) == player_moves_.end()) {
@@ -152,7 +152,7 @@ private:
       }
     }
 
-    // Check for Blocking Moves
+    // cek gerakan block
     for (int move = 1; move <= 9; ++move) {
       if (find(computer_moves_.begin(), computer_moves_.end(), move) == computer_moves_.end() &&
         find(player_moves_.begin(), player_moves_.end(), move) == player_moves_.end()) {
@@ -164,7 +164,7 @@ private:
       }
     }
 
-    // Check for Forking Moves
+    // cek kemungkinan fork
     for (int move = 1; move <= 9; ++move) {
       if (find(computer_moves_.begin(), computer_moves_.end(), move) == computer_moves_.end() &&
         find(player_moves_.begin(), player_moves_.end(), move) == player_moves_.end()) {
@@ -174,7 +174,7 @@ private:
       }
     }
 
-    // Check for Blocking Forks
+    // cek kemungkinan untuk block fork
     for (int move = 1; move <= 9; ++move) {
       if (find(computer_moves_.begin(), computer_moves_.end(), move) == computer_moves_.end() &&
         find(player_moves_.begin(), player_moves_.end(), move) == player_moves_.end()) {
@@ -184,7 +184,7 @@ private:
       }
     }
 
-    // Occupying the Corners
+    // isi korner
     std::vector<int> corners = {1, 3, 7, 9};
     for (int corner : corners) {
       if (find(computer_moves_.begin(), computer_moves_.end(), corner) == computer_moves_.end() &&
@@ -193,7 +193,7 @@ private:
       }
     }
 
-    // Occupying the Sides
+    // isi edge (sisi)
     std::vector<int> sides = {2, 4, 6, 8};
     for (int side : sides) {
       if (find(computer_moves_.begin(), computer_moves_.end(), side) == computer_moves_.end() &&
@@ -202,12 +202,12 @@ private:
       }
     }
 
-    return -1; // If no move is found
+    return -1; // handle no return
   }
 };
 
 int main(int argc, char **argv) {
-  srand(time(NULL));  // Initialize random seed
+  srand(time(NULL));
   rclcpp::init(argc, argv);
   auto node = std::make_shared<ComputerNode>();
   rclcpp::spin(node);
